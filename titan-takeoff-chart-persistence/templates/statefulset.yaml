@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: titan-takeoff
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: titan-takeoff
+  serviceName: titan-takeoff
+  template:
+    metadata:
+      labels:
+        app: titan-takeoff
+    spec:
+      containers:
+        - name: titan-takeoff
+          image: {{ if .Values.gpu }}tytn/fabulinus:latest{{ else }}tytn/fabulinus:latest-cpu{{ end }}
+          ports:
+            - containerPort: 80
+          env:
+            - name: TAKEOFF_MODEL_NAME
+              value: {{ .Values.modelName }}
+          {{- if .Values.gpu }}
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          {{- end }}
+          {{- if .Values.persistence }}
+          volumeMounts:
+            - name: model-cache
+              mountPath: /.iris_cache
+          {{- end }}
+  {{- if .Values.persistence }}
+  volumeClaimTemplates:
+    - metadata:
+        name: model-cache
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .Values.cacheSize }}
+  {{- end }}
+

@@ -1,0 +1,4 @@
+modelName: tiiuae/falcon-7b-instruct
+gpu: false
+persistence: true
+cacheSize: 40Gi

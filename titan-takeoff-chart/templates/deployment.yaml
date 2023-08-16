@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: titan-takeoff
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: titan-takeoff
+  template:
+    metadata:
+      labels:
+        app: titan-takeoff
+    spec:
+      containers:
+        - name: titan-takeoff
+          image: {{ if .Values.gpu }}tytn/fabulinus:latest{{ else }}tytn/fabulinus:latest-cpu{{ end }}
+          ports:
+            - containerPort: 80
+          env:
+            - name: TAKEOFF_MODEL_NAME
+              value: {{ .Values.modelName }}
+          {{- if .Values.gpu }}
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          {{- end }}
+

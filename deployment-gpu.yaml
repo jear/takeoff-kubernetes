@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: titan-takeoff
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: titan-takeoff
+  template:
+    metadata:
+      labels:
+        app: titan-takeoff
+    spec:
+      containers:
+        - name: titan-takeoff
+          image: tytn/fabulinus:latest
+          env:
+            - name: TAKEOFF_MODEL_NAME
+              value: "google/flan-t5-small"
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          ports:
+            - containerPort: 80
